@@ -1,0 +1,124 @@
+<%- include('../partials/head', { pageTitle: `${book.title} - Book Details` }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <div style="margin-bottom: 1.5rem;">
+      <a href="/books" class="btn btn-secondary btn-sm">&larr; Back to Catalogue</a>
+    </div>
+
+    <%- include('../partials/flash-message') %>
+
+    <div class="book-details-card">
+      <!-- Book Visual Cover Column -->
+      <div class="book-details-cover">
+        <span class="cover-icon">📖</span>
+        <div style="font-weight: 700; font-size: 1.2rem; color: #ffffff; margin-bottom: 0.5rem; line-height: 1.3;"><%= book.title %></div>
+        <div style="font-size: 0.925rem; color: #94a3b8;"><%= book.author %></div>
+        <div style="margin-top: 1.5rem;">
+          <span class="badge badge-secondary" style="font-size: 0.8rem; padding: 0.35rem 0.8rem;">
+            <%= book.category %>
+          </span>
+        </div>
+      </div>
+
+      <!-- Book Information & Actions Column -->
+      <div class="book-details-info">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+          <span class="badge <%= statusBadge.class %>" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+            <%= statusBadge.label %>
+          </span>
+          <span style="color: var(--text-muted); font-size: 0.875rem;">Category: <%= book.category %></span>
+        </div>
+
+        <h1><%= book.title %></h1>
+        <div class="meta-author">Authored by <strong><%= book.author %></strong></div>
+
+        <table class="meta-table">
+          <tbody>
+            <tr>
+              <td>International Standard Book Number (ISBN)</td>
+              <td><code><%= book.isbn %></code></td>
+            </tr>
+            <tr>
+              <td>Category / Subject</td>
+              <td><strong><%= book.category %></strong></td>
+            </tr>
+            <tr>
+              <td>Total Catalogue Stock</td>
+              <td><%= book.totalCopies %> copies</td>
+            </tr>
+            <tr>
+              <td>Currently Available to Borrow</td>
+              <td>
+                <span class="<%= book.availableCopies > 0 ? 'text-success' : 'text-danger' %>">
+                  <%= book.availableCopies %> copies
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Standard Lending Period</td>
+              <td>14 Days (₹5/day late fine applies afterwards)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Action Section Box -->
+        <div style="background: rgba(15, 23, 42, 0.7); padding: 1.75rem; border-radius: var(--radius-lg); border: 1px solid var(--border-glass);">
+          <% if (typeof currentUser === 'undefined' || !currentUser) { %>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="font-size: 1.05rem; color: #ffffff;">Want to borrow this book?</strong>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.875rem; color: var(--text-muted);">Please log in or register a member account to borrow titles from our digital catalogue.</p>
+              </div>
+              <a href="/login" class="btn btn-primary">Login to Borrow</a>
+            </div>
+          <% } else if (currentUser.role === 'admin') { %>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="font-size: 1.05rem; color: #ffffff;">Administrator Access</strong>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.875rem; color: var(--text-muted);">You are viewing this book as a library administrator.</p>
+              </div>
+              <div style="display: flex; gap: 0.75rem;">
+                <a href="/admin/books/<%= book._id %>/edit" class="btn btn-secondary btn-sm">Edit Book</a>
+                <a href="/admin/books" class="btn btn-primary btn-sm">Manage in Admin Panel</a>
+              </div>
+            </div>
+          <% } else if (hasBorrowed) { %>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="color: var(--gold-warm); font-size: 1.05rem;">Book Currently in Your Possession</strong>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.875rem; color: var(--text-muted);">You already have an active borrowed copy of this book.</p>
+              </div>
+              <a href="/my-books" class="btn btn-gold btn-sm">View in My Books</a>
+            </div>
+          <% } else if (book.availableCopies > 0) { %>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="color: var(--success); font-size: 1.05rem;">Available for Lending</strong>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.875rem; color: var(--text-muted);">You can borrow up to 3 books simultaneously for 14 days.</p>
+              </div>
+              <form action="/books/<%= book._id %>/issue" method="POST" onsubmit="return confirmAction('Confirm borrowing this book for 14 days?');">
+                <button type="submit" class="btn btn-primary" style="padding: 0.8rem 1.75rem; font-size: 1rem;">
+                  <span>📚</span> Issue Book Now
+                </button>
+              </form>
+            </div>
+          <% } else { %>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="color: var(--danger); font-size: 1.05rem;">Currently Unavailable</strong>
+                <p style="margin: 0.2rem 0 0 0; font-size: 0.875rem; color: var(--text-muted);">All catalogue copies are actively on loan to library members.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" disabled style="opacity: 0.6; cursor: not-allowed;">
+                Out of Stock
+              </button>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

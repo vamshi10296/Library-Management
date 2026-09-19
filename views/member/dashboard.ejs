@@ -1,0 +1,191 @@
+<%- include('../partials/head', { pageTitle: 'Member Dashboard - Library Management System' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <!-- Welcome Header & Quick Actions -->
+    <div class="dashboard-header">
+      <div class="dashboard-title-group">
+        <h1>Welcome, <%= user.name %> 👋</h1>
+        <p class="dashboard-subtitle">Track your borrowed titles, return deadlines, and discover new books from the collection.</p>
+      </div>
+      <div class="dashboard-header-actions">
+        <a href="/books" class="btn btn-primary">
+          <span>📖</span> Explore Books
+        </a>
+        <a href="/my-books" class="btn btn-secondary">
+          <span>📚</span> My Books (<%= stats.currentlyBorrowed %>)
+        </a>
+      </div>
+    </div>
+
+    <!-- Statistics Metric Cards -->
+    <div class="stats-grid">
+      <!-- Card 1: Currently Borrowed -->
+      <div class="stat-card">
+        <div class="stat-icon blue">📚</div>
+        <div class="stat-content">
+          <div class="stat-value"><%= stats.currentlyBorrowed %> / 3</div>
+          <div class="stat-label">Currently Borrowed</div>
+        </div>
+      </div>
+
+      <!-- Card 2: Available Books -->
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-content">
+          <div class="stat-value"><%= stats.availableBooks %></div>
+          <div class="stat-label">Available Titles</div>
+        </div>
+      </div>
+
+      <!-- Card 3: Overdue Books -->
+      <div class="stat-card">
+        <div class="stat-icon red">⚠️</div>
+        <div class="stat-content">
+          <div class="stat-value"><%= stats.overdueBooks %></div>
+          <div class="stat-label">Overdue Books</div>
+        </div>
+      </div>
+
+      <!-- Card 4: Total Borrowed (Lifetime) -->
+      <div class="stat-card">
+        <div class="stat-icon amber">📈</div>
+        <div class="stat-content">
+          <div class="stat-value"><%= stats.totalBorrowed %></div>
+          <div class="stat-label">Lifetime Loans</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Warning Banner if any -->
+    <% if (overdueBooks && overdueBooks.length > 0) { %>
+      <div class="alert alert-warning" style="margin-bottom: 2rem;">
+        <div>
+          <strong>Action Required:</strong> You have <%= overdueBooks.length %> overdue book(s). 
+          Late fines accrue at ₹5 per day. Please return them to the library as soon as possible.
+        </div>
+        <a href="/my-books" class="btn btn-sm btn-gold" style="white-space: nowrap; margin-left: 1rem;">View Overdue Books</a>
+      </div>
+    <% } %>
+
+    <!-- 2-Column Sections: Current Books & Due Soon -->
+    <div class="dashboard-grid-2">
+      <!-- Section 1: My Current Books -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📖 My Current Books</h3>
+          <a href="/my-books" class="btn btn-secondary btn-sm">View All</a>
+        </div>
+        <% if (currentBooks && currentBooks.length > 0) { %>
+          <div class="table-responsive" style="border: none; box-shadow: none;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Book</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% currentBooks.forEach(function(item) { %>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600; color: var(--text-main);"><%= item.book ? item.book.title : 'Book Title' %></div>
+                      <div style="font-size: 0.8rem; color: var(--text-muted);"><%= item.book ? item.book.author : '' %></div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600;"><%= new Date(item.dueDate).toLocaleDateString('en-GB') %></div>
+                      <% if (item.isOverdue) { %>
+                        <div style="font-size: 0.75rem; color: var(--danger); font-weight: 600;">
+                          <%= item.overdueDays %> day(s) late
+                        </div>
+                      <% } else { %>
+                        <div style="font-size: 0.75rem; color: var(--success);">
+                          On Schedule
+                        </div>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (item.isOverdue) { %>
+                        <span class="badge badge-danger">Overdue</span>
+                        <div style="font-size: 0.75rem; color: var(--danger); font-weight: 700; margin-top: 2px;">
+                          Fine: ₹<%= item.currentFine %>
+                        </div>
+                      <% } else { %>
+                        <span class="badge badge-info">Issued</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <form action="/borrow/<%= item._id %>/return" method="POST" onsubmit="return confirmAction('Confirm return for this book?');">
+                        <button type="submit" class="btn btn-secondary btn-sm">Return</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state" style="padding: 2.5rem 1rem;">
+            <div class="empty-state-icon">📚</div>
+            <h4 style="color: #f8fafc; margin-bottom: 0.25rem;">No Active Loans</h4>
+            <p class="empty-state-desc" style="font-size: 0.85rem; margin-bottom: 1rem;">You don't have any books checked out right now.</p>
+            <a href="/books" class="btn btn-primary btn-sm">Explore Books</a>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Section 2: Books Due Soon -->
+      <div class="card">
+        <div class="card-header">
+          <h3>⏱️ Return Deadlines (Next 3 Days)</h3>
+        </div>
+        <% if (dueSoonBooks && dueSoonBooks.length > 0) { %>
+          <div class="table-responsive" style="border: none; box-shadow: none;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Book Title</th>
+                  <th>Due Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% dueSoonBooks.forEach(function(item) { %>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;"><%= item.book ? item.book.title : 'Book Title' %></div>
+                      <div style="font-size: 0.8rem; color: var(--text-muted);"><%= item.book ? item.book.author : '' %></div>
+                    </td>
+                    <td>
+                      <span class="badge badge-warning">
+                        <%= new Date(item.dueDate).toLocaleDateString('en-GB') %>
+                      </span>
+                    </td>
+                    <td>
+                      <form action="/borrow/<%= item._id %>/return" method="POST" onsubmit="return confirmAction('Confirm return for this book?');">
+                        <button type="submit" class="btn btn-primary btn-sm">Return Now</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state" style="padding: 2.5rem 1rem;">
+            <div class="empty-state-icon">🎉</div>
+            <h4 style="color: #f8fafc; margin-bottom: 0.25rem;">All Clear!</h4>
+            <p class="empty-state-desc" style="font-size: 0.85rem; margin-bottom: 0;">No loans are due within the next 3 days.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

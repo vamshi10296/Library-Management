@@ -1,0 +1,37 @@
+<aside class="admin-sidebar">
+  <div class="sidebar-title">Admin Management</div>
+  <ul class="sidebar-menu">
+    <li>
+      <a href="/admin/dashboard" class="sidebar-link <%= currentPath === '/admin/dashboard' ? 'active' : '' %>">
+        <span class="icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/books" class="sidebar-link <%= currentPath.startsWith('/admin/books') ? 'active' : '' %>">
+        <span class="icon">📖</span>
+        <span>Books Catalogue</span>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/members" class="sidebar-link <%= currentPath === '/admin/members' ? 'active' : '' %>">
+        <span class="icon">👥</span>
+        <span>Members Directory</span>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/borrow-records" class="sidebar-link <%= currentPath === '/admin/borrow-records' ? 'active' : '' %>">
+        <span class="icon">📋</span>
+        <span>Borrow Records</span>
+      </a>
+    </li>
+    <li style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+      <form action="/logout" method="POST" style="width: 100%;">
+        <button type="submit" class="sidebar-link" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
+          <span class="icon">🚪</span>
+          <span>Logout</span>
+        </button>
+      </form>
+    </li>
+  </ul>
+</aside>

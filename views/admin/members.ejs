@@ -1,0 +1,113 @@
+<%- include('../partials/head', { pageTitle: 'Manage Members - Admin Panel' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <div class="dashboard-layout">
+      <!-- Admin Sidebar Navigation -->
+      <%- include('../partials/sidebar') %>
+
+      <!-- Main Members Directory -->
+      <div class="dashboard-main">
+        <div class="dashboard-header">
+          <div class="dashboard-title-group">
+            <h1>Members Directory</h1>
+            <p class="dashboard-subtitle">Registered library patrons, contact information, and active loan counts.</p>
+          </div>
+          <div class="dashboard-header-actions">
+            <span class="badge badge-info" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+              Total Members: <%= members.length %>
+            </span>
+          </div>
+        </div>
+
+        <!-- Search Toolbar -->
+        <div class="toolbar-card">
+          <form action="/admin/members" method="GET" class="search-filter-form">
+            <div class="search-input-group">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                name="search" 
+                class="form-control" 
+                placeholder="Search member by Name or Email..." 
+                value="<%= searchQuery %>"
+              >
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            <% if (searchQuery) { %>
+              <a href="/admin/members" class="btn btn-secondary btn-sm">Reset</a>
+            <% } %>
+          </form>
+        </div>
+
+        <!-- Members Table -->
+        <% if (members && members.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Member Name</th>
+                  <th>Email Address</th>
+                  <th>Role</th>
+                  <th>Joined Date</th>
+                  <th>Currently Borrowed</th>
+                  <th>Account Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% members.forEach(function(member) { %>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
+                        <%= member.name %>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="mailto:<%= member.email %>" style="color: #38bdf8;">
+                        <%= member.email %>
+                      </a>
+                    </td>
+                    <td>
+                      <span class="badge badge-secondary">Member</span>
+                    </td>
+                    <td>
+                      <%= new Date(member.createdAt).toLocaleDateString('en-GB') %>
+                    </td>
+                    <td>
+                      <% if (member.activeBorrowsCount > 0) { %>
+                        <span class="badge badge-warning">
+                          <%= member.activeBorrowsCount %> / 3 Books
+                        </span>
+                      <% } else { %>
+                        <span class="badge badge-secondary">
+                          0 Books
+                        </span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <span class="badge badge-success">
+                        <%= member.accountStatus %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <h3 class="empty-state-title">No Members Found</h3>
+            <p class="empty-state-desc">No registered patrons matched your search criteria "<%= searchQuery %>".</p>
+            <a href="/admin/members" class="btn btn-secondary">Reset Search</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

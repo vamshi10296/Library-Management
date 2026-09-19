@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2022",
+    "checkJs": false,
+    "lib": ["DOM", "ES2022"]
+  },
+  "include": ["**/*.js"],
+  "exclude": ["node_modules"]
+}

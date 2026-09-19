@@ -1,0 +1,136 @@
+<%- include('../partials/head', { pageTitle: 'Manage Books - Admin Panel' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <div class="dashboard-layout">
+      <!-- Admin Sidebar Navigation -->
+      <%- include('../partials/sidebar') %>
+
+      <!-- Main Content -->
+      <div class="dashboard-main">
+        <div class="dashboard-header">
+          <div class="dashboard-title-group">
+            <h1>Books Catalogue Inventory</h1>
+            <p class="dashboard-subtitle">Add, edit, delete, and inspect inventory copies across categories.</p>
+          </div>
+          <div class="dashboard-header-actions">
+            <a href="/admin/books/add" class="btn btn-primary">
+              <span>➕</span> Add New Book
+            </a>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="toolbar-card">
+          <form action="/admin/books" method="GET" class="search-filter-form">
+            <div class="search-input-group">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                name="search" 
+                class="form-control" 
+                placeholder="Search by Title, Author, or ISBN..." 
+                value="<%= searchQuery %>"
+              >
+            </div>
+
+            <div class="category-select-group">
+              <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="All" <%= selectedCategory === 'All' ? 'selected' : '' %>>All Categories</option>
+                <% categories.forEach(function(cat) { %>
+                  <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            <% if (searchQuery || (selectedCategory && selectedCategory !== 'All')) { %>
+              <a href="/admin/books" class="btn btn-secondary btn-sm">Reset</a>
+            <% } %>
+          </form>
+
+          <!-- Category Chips for Admin -->
+          <div class="category-chips-container">
+            <a href="/admin/books" class="category-chip <%= selectedCategory === 'All' ? 'active' : '' %>">
+              All
+            </a>
+            <% categories.forEach(function(cat) { %>
+              <a href="/admin/books?category=<%= encodeURIComponent(cat) %>" class="category-chip <%= selectedCategory === cat ? 'active' : '' %>">
+                <%= cat %>
+              </a>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Books Management Table -->
+        <% if (books && books.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>ISBN</th>
+                  <th>Category</th>
+                  <th>Total Copies</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% books.forEach(function(book) { %>
+                  <tr>
+                    <td>
+                      <strong style="color: var(--text-main); font-size: 0.95rem;"><%= book.title %></strong>
+                    </td>
+                    <td><%= book.author %></td>
+                    <td><code><%= book.isbn %></code></td>
+                    <td>
+                      <span class="badge badge-secondary"><%= book.category %></span>
+                    </td>
+                    <td><%= book.totalCopies %></td>
+                    <td>
+                      <strong class="<%= book.availableCopies > 0 ? 'text-available' : 'text-unavailable' %>">
+                        <%= book.availableCopies %>
+                      </strong>
+                    </td>
+                    <td>
+                      <span class="badge <%= book.statusBadge.class %>">
+                        <%= book.statusBadge.label %>
+                      </span>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: inline-flex; gap: 0.5rem;">
+                        <a href="/admin/books/<%= book._id %>/edit" class="btn btn-secondary btn-sm" title="Edit Book">
+                          ✏️ Edit
+                        </a>
+                        <form action="/admin/books/<%= book._id %>?_method=DELETE" method="POST" onsubmit="return confirmAction('Are you sure you want to delete this book? This cannot be undone.');" style="display: inline;">
+                          <button type="submit" class="btn btn-danger btn-sm" title="Delete Book">
+                            🗑️ Delete
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <div class="empty-state-icon">📖</div>
+            <h3 class="empty-state-title">No Books Found</h3>
+            <p class="empty-state-desc">No catalogue titles matched your criteria. Add a new book or adjust your filters.</p>
+            <a href="/admin/books" class="btn btn-secondary">Reset Filters</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

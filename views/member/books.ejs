@@ -1,0 +1,129 @@
+<%- include('../partials/head', { pageTitle: 'Book Catalogue - Library Management System' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <!-- Page Header -->
+    <div class="dashboard-header">
+      <div class="dashboard-title-group">
+        <h1>Library Book Catalogue</h1>
+        <p class="dashboard-subtitle">Explore academic textbooks, reference materials, research journals, and literature.</p>
+      </div>
+      <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'admin') { %>
+        <a href="/admin/books/add" class="btn btn-primary">
+          <span>➕</span> Add New Book
+        </a>
+      <% } %>
+    </div>
+
+    <!-- Modern Search & Filter Card -->
+    <div class="toolbar-card">
+      <form action="/books" method="GET" class="search-filter-form">
+        <!-- Search Input -->
+        <div class="search-input-group">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            name="search" 
+            class="form-control" 
+            placeholder="Search by Title, Author, or ISBN..." 
+            value="<%= searchQuery %>"
+            autocomplete="off"
+          >
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="category-select-group">
+          <select name="category" class="form-select" onchange="this.form.submit()">
+            <option value="All" <%= selectedCategory === 'All' ? 'selected' : '' %>>All Categories</option>
+            <% categories.forEach(function(cat) { %>
+              <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">
+          <span>🔍</span> Filter
+        </button>
+
+        <% if (searchQuery || (selectedCategory && selectedCategory !== 'All')) { %>
+          <a href="/books" class="btn btn-secondary btn-sm">Clear Filters</a>
+        <% } %>
+      </form>
+
+      <!-- Category Filter Chips -->
+      <div class="category-chips-container">
+        <a href="/books" class="category-chip <%= selectedCategory === 'All' ? 'active' : '' %>">
+          All
+        </a>
+        <% categories.forEach(function(cat) { %>
+          <a href="/books?category=<%= encodeURIComponent(cat) %>" class="category-chip <%= selectedCategory === cat ? 'active' : '' %>">
+            <%= cat %>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Books Grid Results -->
+    <% if (books && books.length > 0) { %>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; color: var(--text-muted); font-size: 0.9rem;">
+        <div>
+          Showing <strong><%= books.length %></strong> books in catalogue
+        </div>
+        <div style="font-size: 0.825rem;">
+          ⚡ Type in search for instant filtering
+        </div>
+      </div>
+
+      <div class="books-grid">
+        <% books.forEach(function(book) { %>
+          <div class="book-card">
+            <div class="book-card-cover">
+              <div class="book-cover-pattern"></div>
+              <span class="book-category-pill"><%= book.category %></span>
+              <span class="book-cover-icon">📚</span>
+            </div>
+            <div class="book-card-body">
+              <h3 class="book-card-title"><%= book.title %></h3>
+              <p class="book-card-author">By <%= book.author %></p>
+              
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                ISBN: <code><%= book.isbn %></code>
+              </div>
+
+              <div class="book-card-footer">
+                <div>
+                  <span class="badge <%= book.statusBadge.class %>">
+                    <%= book.statusBadge.label %>
+                  </span>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    <%= book.availableCopies %> of <%= book.totalCopies %> copies left
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <a href="/books/<%= book._id %>" class="btn btn-secondary btn-sm">
+                    View Details &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h3 class="empty-state-title">No matching books found</h3>
+        <p class="empty-state-desc">
+          We couldn't find any books matching "<%= searchQuery %>" in the selected category.
+        </p>
+        <a href="/books" class="btn btn-secondary">Reset Search Filters</a>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

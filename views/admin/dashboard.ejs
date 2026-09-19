@@ -1,0 +1,275 @@
+<%- include('../partials/head', { pageTitle: 'Admin Dashboard - Library Management System' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <div class="dashboard-layout">
+      <!-- Admin Sidebar Navigation Partial -->
+      <%- include('../partials/sidebar') %>
+
+      <!-- Main Dashboard Content -->
+      <div class="dashboard-main">
+        <!-- Header & Quick Actions -->
+        <div class="dashboard-header">
+          <div class="dashboard-title-group">
+            <h1>Librarian Administration Console</h1>
+            <p class="dashboard-subtitle">Real-time catalogue metrics, member loans, and overdue monitoring.</p>
+          </div>
+          <div class="dashboard-header-actions">
+            <a href="/admin/books/add" class="btn btn-primary">
+              <span>➕</span> Add Book
+            </a>
+            <a href="/admin/books" class="btn btn-secondary">
+              <span>📖</span> Manage Books
+            </a>
+            <a href="/admin/members" class="btn btn-secondary">
+              <span>👥</span> Manage Members
+            </a>
+            <a href="/admin/borrow-records" class="btn btn-secondary">
+              <span>📋</span> Borrow Records
+            </a>
+          </div>
+        </div>
+
+        <!-- 4 Core Metric Cards (Calculated directly from MongoDB) -->
+        <div class="stats-grid">
+          <!-- Metric 1: Total Books -->
+          <div class="stat-card">
+            <div class="stat-icon blue">📖</div>
+            <div class="stat-content">
+              <div class="stat-value"><%= stats.totalBooks %></div>
+              <div class="stat-label">Total Books Catalogued</div>
+            </div>
+          </div>
+
+          <!-- Metric 2: Total Members -->
+          <div class="stat-card">
+            <div class="stat-icon green">👥</div>
+            <div class="stat-content">
+              <div class="stat-value"><%= stats.totalMembers %></div>
+              <div class="stat-label">Registered Members</div>
+            </div>
+          </div>
+
+          <!-- Metric 3: Currently Issued Books -->
+          <div class="stat-card">
+            <div class="stat-icon amber">📚</div>
+            <div class="stat-content">
+              <div class="stat-value"><%= stats.issuedBooks %></div>
+              <div class="stat-label">Currently Issued Books</div>
+            </div>
+          </div>
+
+          <!-- Metric 4: Overdue Books -->
+          <div class="stat-card">
+            <div class="stat-icon red">⚠️</div>
+            <div class="stat-content">
+              <div class="stat-value"><%= stats.overdueBooks %></div>
+              <div class="stat-label">Overdue Loans</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Statistics & Circulation Health Panel -->
+        <div class="card" style="margin-bottom: 2rem; padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h3 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.2rem;">📊 Library Operations & Circulation Health</h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Real-time inventory circulation balance and overdue risk metrics.</p>
+            </div>
+            <span class="badge badge-info">Live Analytics</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.75rem;">
+            <!-- Utilization Metric -->
+            <div>
+              <% 
+                const circPercent = stats.totalBooks > 0 ? Math.min(Math.round((stats.issuedBooks / stats.totalBooks) * 100), 100) : 0;
+              %>
+              <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.4rem;">
+                <span style="color: var(--text-body); font-weight: 500;">Collection Circulation Rate</span>
+                <strong style="color: #38bdf8;"><%= circPercent %>%</strong>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill cyan" style="width: <%= Math.max(circPercent, 6) %>%;"></div>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;">
+                <%= stats.issuedBooks %> of <%= stats.totalBooks %> titles currently in active member circulation.
+              </div>
+            </div>
+
+            <!-- Overdue Compliance Metric -->
+            <div>
+              <% 
+                const compliancePercent = stats.issuedBooks > 0 ? Math.max(100 - Math.round((stats.overdueBooks / stats.issuedBooks) * 100), 0) : 100;
+              %>
+              <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.4rem;">
+                <span style="color: var(--text-body); font-weight: 500;">On-Schedule Loan Compliance</span>
+                <strong style="color: <%= stats.overdueBooks > 0 ? '#fbbf24' : '#34d399' %>;"><%= compliancePercent %>%</strong>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill <%= stats.overdueBooks > 0 ? 'amber' : 'emerald' %>" style="width: <%= Math.max(compliancePercent, 6) %>%;"></div>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;">
+                <%= stats.overdueBooks %> overdue loan(s) requiring follow-up and fine collection.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 1: Most Borrowed Books & Low Availability Books -->
+        <div class="dashboard-grid-2">
+          <!-- Most Borrowed Books -->
+          <div class="card">
+            <div class="card-header">
+              <h3>🔥 Most Borrowed Titles</h3>
+              <span class="badge badge-info">Top Circulation</span>
+            </div>
+            <% if (mostBorrowedBooks && mostBorrowedBooks.length > 0) { %>
+              <div class="table-responsive" style="border: none; box-shadow: none;">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Title & Author</th>
+                      <th>Category</th>
+                      <th style="text-align: right;">Total Loans</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% mostBorrowedBooks.forEach(function(item) { %>
+                      <tr>
+                        <td>
+                          <div style="font-weight: 600;"><%= item.book.title %></div>
+                          <div style="font-size: 0.8rem; color: var(--text-muted);"><%= item.book.author %></div>
+                        </td>
+                        <td>
+                          <span class="badge badge-secondary"><%= item.book.category %></span>
+                        </td>
+                        <td style="text-align: right;">
+                          <strong style="color: var(--accent-blue); font-size: 1rem;"><%= item.borrowCount %></strong>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="empty-state" style="padding: 2.5rem 1rem;">
+                <p class="empty-state-desc">No borrowing transactions recorded yet.</p>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Low Availability Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <h3>⚡ Low Stock & Out of Stock</h3>
+              <span class="badge badge-warning">Restock Notice</span>
+            </div>
+            <% if (typeof lowStockBooks !== 'undefined' && lowStockBooks && lowStockBooks.length > 0) { %>
+              <div class="table-responsive" style="border: none; box-shadow: none;">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th style="text-align: right;">Available</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% lowStockBooks.forEach(function(book) { %>
+                      <tr>
+                        <td>
+                          <div style="font-weight: 600;"><%= book.title %></div>
+                          <div style="font-size: 0.8rem; color: var(--text-muted);"><%= book.author %></div>
+                        </td>
+                        <td>
+                          <span class="badge badge-secondary"><%= book.category %></span>
+                        </td>
+                        <td style="text-align: right;">
+                          <% if (book.availableCopies === 0) { %>
+                            <span class="badge badge-danger">0 Copies</span>
+                          <% } else { %>
+                            <span class="badge badge-warning"><%= book.availableCopies %> Left</span>
+                          <% } %>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="empty-state" style="padding: 2.5rem 1rem;">
+                <p class="empty-state-desc">All books have healthy stock levels.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Row 2: Recent Borrowing Activity -->
+        <div class="card">
+          <div class="card-header">
+            <h3>🕒 Recent Borrowing & Circulation Activity</h3>
+            <a href="/admin/borrow-records" class="btn btn-secondary btn-sm">Full History &rarr;</a>
+          </div>
+          <% if (recentActivity && recentActivity.length > 0) { %>
+            <div class="table-responsive" style="border: none; box-shadow: none;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Book</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Fine</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% recentActivity.forEach(function(record) { %>
+                    <tr>
+                      <td>
+                        <div style="font-weight: 600;"><%= record.user ? record.user.name : 'Unknown User' %></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);"><%= record.user ? record.user.email : '' %></div>
+                      </td>
+                      <td>
+                        <div style="font-weight: 600;"><%= record.book ? record.book.title : 'Deleted Book' %></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);"><%= record.book ? record.book.category : '' %></div>
+                      </td>
+                      <td><%= new Date(record.issueDate).toLocaleDateString('en-GB') %></td>
+                      <td><%= new Date(record.dueDate).toLocaleDateString('en-GB') %></td>
+                      <td>
+                        <% if (record.status === 'Returned') { %>
+                          <span class="badge badge-success">Returned</span>
+                        <% } else if (record.overdueDays > 0) { %>
+                          <span class="badge badge-danger">Overdue (<%= record.overdueDays %>d)</span>
+                        <% } else { %>
+                          <span class="badge badge-info">Issued</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (record.liveFine > 0) { %>
+                          <span style="color: var(--danger); font-weight: 700;">₹<%= record.liveFine %></span>
+                        <% } else { %>
+                          <span style="color: var(--success);">₹0</span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state" style="padding: 2.5rem 1rem;">
+              <p class="empty-state-desc">No borrowing transactions recorded yet.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

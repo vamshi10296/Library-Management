@@ -1,0 +1,273 @@
+<%- include('partials/head', { pageTitle: 'LibManager - Your Library, Smarter' }) %>
+<%- include('partials/navbar') %>
+
+<main class="main-content" style="padding-top: 0;">
+  <!-- Hero Section with Ambient Glow & Floating Card Visuals -->
+  <section class="hero-section" style="background: radial-gradient(circle at 50% 10%, #172554 0%, #0b0f19 80%); color: #ffffff; padding: 5rem 0 6rem 0; position: relative; overflow: hidden;">
+    <!-- Grid Pattern Overlay -->
+    <div style="position: absolute; inset: 0; opacity: 0.12; background-image: radial-gradient(rgba(56, 189, 248, 0.5) 1.5px, transparent 1.5px); background-size: 28px 28px; pointer-events: none;"></div>
+    
+    <!-- Neon Mesh Glow Orbs -->
+    <div style="position: absolute; top: -100px; left: 10%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, transparent 70%); filter: blur(60px); pointer-events: none;"></div>
+    <div style="position: absolute; bottom: -80px; right: 15%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%); filter: blur(70px); pointer-events: none;"></div>
+
+    <div class="container" style="position: relative; z-index: 1;">
+      <%- include('partials/flash-message') %>
+
+      <div style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 3.5rem; align-items: center;">
+        <!-- Left Hero Content -->
+        <div>
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); padding: 0.45rem 1rem; border-radius: var(--radius-full); font-size: 0.85rem; color: #38bdf8; font-weight: 600; margin-bottom: 1.5rem; box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);">
+            <span>✨</span> Next-Generation Academic Library Portal
+          </div>
+
+          <h1 style="font-size: 3.5rem; font-weight: 800; color: #ffffff; line-height: 1.15; margin-bottom: 1.25rem; letter-spacing: -0.03em;">
+            Your Library, <span style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Smarter.</span>
+          </h1>
+
+          <p style="font-size: 1.2rem; color: #94a3b8; max-width: 540px; margin-bottom: 2.25rem; line-height: 1.6;">
+            Discover academic literature, manage lending transactions, and automate catalogue circulation in one unified digital platform.
+          </p>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
+            <a href="/books" class="btn btn-primary btn-lg">
+              <span>📖</span> Explore Books
+            </a>
+            <% if (typeof currentUser === 'undefined' || !currentUser) { %>
+              <a href="/register" class="btn btn-secondary btn-lg" style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2);">
+                <span>🚀</span> Get Started
+              </a>
+              <a href="/login" class="btn btn-link" style="color: #cbd5e1; padding: 0.85rem 1rem; font-size: 1rem;">
+                Member Login &rarr;
+              </a>
+            <% } else { %>
+              <a href="<%= (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'admin') ? '/admin/dashboard' : '/dashboard' %>" class="btn btn-gold btn-lg">
+                <span>📊</span> Go to Dashboard
+              </a>
+            <% } %>
+          </div>
+
+          <!-- Trust & Stat Indicators -->
+          <div style="display: flex; gap: 1.75rem; flex-wrap: wrap; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #cbd5e1; font-weight: 500;">
+              <span style="color: #fbbf24; font-size: 1.1rem;">⭐</span>
+              <span><strong>10+ Books</strong> Catalogued</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #cbd5e1; font-weight: 500;">
+              <span style="color: #38bdf8; font-size: 1.1rem;">⚡</span>
+              <span><strong>Smart Borrowing</strong> (14 Days)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #cbd5e1; font-weight: 500;">
+              <span style="color: #34d399; font-size: 1.1rem;">🛡️</span>
+              <span><strong>Secure Access</strong> (Session Auth)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Visual: Floating Glass Cards Graphic -->
+        <div style="display: flex; justify-content: center; position: relative;">
+          <!-- Ambient Glow Behind Visual -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%); filter: blur(30px);"></div>
+
+          <div style="width: 100%; max-width: 420px; background: rgba(17, 24, 39, 0.85); border: 1px solid var(--border-glass); border-radius: var(--radius-xl); padding: 2rem; box-shadow: var(--shadow-xl), 0 0 35px rgba(14, 165, 233, 0.18); backdrop-filter: blur(20px); position: relative; z-index: 2;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Live Library Stats</span>
+              </div>
+              <span class="badge badge-info" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">MongoDB Atlas Live</span>
+            </div>
+
+            <!-- 4 Modern Stat Blocks inside Hero Panel -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <!-- Block 1: Books -->
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: var(--radius-md); transition: transform 0.2s ease;">
+                <div style="color: #38bdf8; font-size: 1.25rem; margin-bottom: 0.25rem;">📖</div>
+                <div class="hero-stat-value" style="font-weight: 800; color: #ffffff; font-size: 1.6rem; line-height: 1.1;"><%= stats.totalBooks %></div>
+                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.2rem;">Total Books</div>
+              </div>
+
+              <!-- Block 2: Available -->
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: var(--radius-md); transition: transform 0.2s ease;">
+                <div style="color: #34d399; font-size: 1.25rem; margin-bottom: 0.25rem;">✅</div>
+                <div class="hero-stat-value" style="font-weight: 800; color: #34d399; font-size: 1.6rem; line-height: 1.1;"><%= stats.totalAvailable %></div>
+                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.2rem;">Available Copies</div>
+              </div>
+
+              <!-- Block 3: Categories -->
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: var(--radius-md); transition: transform 0.2s ease;">
+                <div style="color: #fbbf24; font-size: 1.25rem; margin-bottom: 0.25rem;">🏷️</div>
+                <div class="hero-stat-value" style="font-weight: 800; color: #fbbf24; font-size: 1.6rem; line-height: 1.1;"><%= stats.categoryCount %></div>
+                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.2rem;">Categories</div>
+              </div>
+
+              <!-- Block 4: Active Loans -->
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: var(--radius-md); transition: transform 0.2s ease;">
+                <div style="color: #f87171; font-size: 1.25rem; margin-bottom: 0.25rem;">📚</div>
+                <div class="hero-stat-value" style="font-weight: 800; color: #f87171; font-size: 1.6rem; line-height: 1.1;"><%= stats.activeBorrowings || 0 %></div>
+                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.2rem;">Active Borrowings</div>
+              </div>
+            </div>
+
+            <!-- Footer Badge -->
+            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b; font-size: 0.8rem;">⚡ Real-time synchronization</span>
+              <a href="/books" style="font-size: 0.8rem; color: #38bdf8; font-weight: 600;">View All &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live Statistics Panel Cards (Full Width Section) -->
+  <section style="padding: 4rem 0 2rem 0; position: relative;">
+    <div class="container">
+      <div style="text-align: center; max-width: 600px; margin: 0 auto 2.5rem auto;">
+        <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Live Library Stats & Insights</h2>
+        <p style="color: var(--text-muted); font-size: 1rem;">
+          Real-time metrics calculated from active collections and circulation records.
+        </p>
+      </div>
+
+      <div class="stats-grid">
+        <!-- Card 1: Total Books -->
+        <div class="stat-card">
+          <div class="stat-icon blue">📖</div>
+          <div class="stat-content">
+            <div class="stat-value"><%= stats.totalBooks %></div>
+            <div class="stat-label">Total Books Catalogued</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Available Copies -->
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-content">
+            <div class="stat-value"><%= stats.totalAvailable %></div>
+            <div class="stat-label">Available Copies</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Categories -->
+        <div class="stat-card">
+          <div class="stat-icon amber">🏷️</div>
+          <div class="stat-content">
+            <div class="stat-value"><%= stats.categoryCount %></div>
+            <div class="stat-label">Subject Categories</div>
+          </div>
+        </div>
+
+        <!-- Card 4: Active Borrowings -->
+        <div class="stat-card">
+          <div class="stat-icon red">📚</div>
+          <div class="stat-content">
+            <div class="stat-value"><%= stats.activeBorrowings || 0 %></div>
+            <div class="stat-label">Active Borrowings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Feature Pillars -->
+  <section style="padding: 4.5rem 0;">
+    <div class="container">
+      <div style="text-align: center; max-width: 640px; margin: 0 auto 3rem auto;">
+        <h2 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem;">Everything Your Library Needs</h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">
+          Engineered for academic institutes, colleges, and public libraries to handle catalogue operations, member lending, and returns with zero hassle.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.75rem;">
+        <!-- Pillar 1: Easy Book Discovery -->
+        <div class="card" style="padding: 2.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.25); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 0 16px rgba(14, 165, 233, 0.2);">
+            🔍
+          </div>
+          <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #ffffff;">Easy Book Discovery</h3>
+          <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+            Instant multi-attribute search across book titles, authors, and ISBNs with responsive category filtering.
+          </p>
+        </div>
+
+        <!-- Pillar 2: Simple Lending -->
+        <div class="card" style="padding: 2.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);">
+            📚
+          </div>
+          <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #ffffff;">Simple Lending</h3>
+          <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+            1-click book issuance with automated 14-day loan terms, copy decrement, and maximum lending limit enforcement.
+          </p>
+        </div>
+
+        <!-- Pillar 3: Smart Tracking -->
+        <div class="card" style="padding: 2.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);">
+            ⏱️
+          </div>
+          <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #ffffff;">Smart Tracking</h3>
+          <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+            Automated overdue detection and daily fine calculation (₹5/day) with comprehensive member borrowing histories.
+          </p>
+        </div>
+
+        <!-- Pillar 4: Library Insights -->
+        <div class="card" style="padding: 2.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);">
+            📊
+          </div>
+          <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #ffffff;">Library Insights</h3>
+          <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+            Comprehensive administrator analytics highlighting circulation volume, most borrowed titles, and low availability alerts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Books Showcase -->
+  <% if (featuredBooks && featuredBooks.length > 0) { %>
+    <section style="padding: 3.5rem 0 4.5rem 0; border-top: 1px solid var(--border-subtle);">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 0.25rem;">Recently Added Titles</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Browse fresh additions to our library catalogue.</p>
+          </div>
+          <a href="/books" class="btn btn-secondary btn-sm">View All Books &rarr;</a>
+        </div>
+
+        <div class="books-grid">
+          <% featuredBooks.forEach(function(book) { %>
+            <div class="book-card">
+              <div class="book-card-cover">
+                <div class="book-cover-pattern"></div>
+                <span class="book-category-pill"><%= book.category %></span>
+                <span class="book-cover-icon">📖</span>
+              </div>
+              <div class="book-card-body">
+                <h3 class="book-card-title"><%= book.title %></h3>
+                <p class="book-card-author">By <%= book.author %></p>
+                <div class="book-card-footer">
+                  <% if (book.availableCopies > 0) { %>
+                    <span class="badge badge-success"><%= book.availableCopies %> copies available</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">Out of Stock</span>
+                  <% } %>
+                  <a href="/books/<%= book._id %>" class="btn btn-secondary btn-sm">Details</a>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+</main>
+
+<%- include('partials/footer') %>

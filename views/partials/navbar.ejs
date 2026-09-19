@@ -1,0 +1,61 @@
+<header class="site-header">
+  <div class="container navbar-container">
+    <!-- Brand Logo -->
+    <a href="<%= (typeof currentUser !== 'undefined' && currentUser) ? (currentUser.role === 'admin' ? '/admin/dashboard' : '/dashboard') : '/' %>" class="brand-logo">
+      <span class="logo-icon">📚</span>
+      <span class="brand-title-gradient">LibManager</span>
+    </a>
+
+    <!-- Mobile Hamburger Toggle -->
+    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation menu">
+      ☰
+    </button>
+
+    <!-- Navigation Links -->
+    <nav>
+      <ul class="nav-links" id="navLinks">
+        <% if (typeof currentUser === 'undefined' || !currentUser) { %>
+          <!-- Guest Navigation -->
+          <li><a href="/" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/') ? 'active' : '' %>">Home</a></li>
+          <li><a href="/books" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/books') ? 'active' : '' %>">Explore Books</a></li>
+          <li><a href="/login" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/login') ? 'active' : '' %>">Login</a></li>
+          <li><a href="/register" class="btn btn-primary btn-sm">Register</a></li>
+        <% } else if (currentUser.role === 'member') { %>
+          <!-- Member Navigation -->
+          <li><a href="/dashboard" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/dashboard') ? 'active' : '' %>">Dashboard</a></li>
+          <li><a href="/books" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/books')) ? 'active' : '' %>">Books</a></li>
+          <li><a href="/my-books" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/my-books') ? 'active' : '' %>">My Books</a></li>
+          <li class="nav-user-badge">
+            <span><%= currentUser.name %></span>
+            <span class="role-tag">Member</span>
+          </li>
+          <li>
+            <form action="/logout" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn-secondary btn-sm" style="color: #cbd5e1; background: transparent; border-color: rgba(255,255,255,0.2);">
+                Logout
+              </button>
+            </form>
+          </li>
+        <% } else if (currentUser.role === 'admin') { %>
+          <!-- Admin Navigation -->
+          <li><a href="/admin/dashboard" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/admin/dashboard') ? 'active' : '' %>">Dashboard</a></li>
+          <li><a href="/admin/books" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/admin/books')) ? 'active' : '' %>">Books</a></li>
+          <li><a href="/admin/members" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/admin/members') ? 'active' : '' %>">Members</a></li>
+          <li><a href="/admin/borrow-records" class="nav-link <%= (typeof currentPath !== 'undefined' && currentPath === '/admin/borrow-records') ? 'active' : '' %>">Borrow Records</a></li>
+          <li class="nav-user-badge">
+            <span><%= currentUser.name %></span>
+            <span class="role-tag admin">Admin</span>
+          </li>
+          <li>
+            <form action="/logout" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn-secondary btn-sm" style="color: #cbd5e1; background: transparent; border-color: rgba(255,255,255,0.2);">
+                Logout
+              </button>
+            </form>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+</header>
+

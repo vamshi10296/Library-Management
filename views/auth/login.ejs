@@ -1,0 +1,89 @@
+<%- include('../partials/head', { pageTitle: 'Login - Library Management System' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-icon">🔐</div>
+        <h1>Welcome Back</h1>
+        <p>Log in to access your digital library account</p>
+      </div>
+
+      <%- include('../partials/flash-message') %>
+
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-error">
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <% errors.forEach(function(err) { %>
+              <li>• <%= err.msg %></li>
+            <% }); %>
+          </ul>
+        </div>
+      <% } %>
+
+      <form action="/login" method="POST" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control <%= errors && errors.some(e => e.path === 'email') ? 'input-error' : '' %>" 
+            placeholder="e.g. member@library.com" 
+            value="<%= typeof oldInput !== 'undefined' && oldInput.email ? oldInput.email : '' %>" 
+            required 
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="password-input-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-control <%= errors && errors.some(e => e.path === 'password') ? 'input-error' : '' %>" 
+              placeholder="Enter your password" 
+              required 
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)" title="Show/Hide password" aria-label="Toggle password visibility">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem; margin-top: 0.5rem;">
+          <span>🚀</span> Sign In
+        </button>
+      </form>
+
+      <!-- Demo Accounts Quick Fill Box for Evaluation/Viva -->
+      <div class="demo-box">
+        <div class="demo-box-title">
+          <span>⚡ Demo Accounts (One-Click Auto-Fill)</span>
+        </div>
+        <div class="demo-account-row">
+          <div>
+            <strong>Admin:</strong> <code>admin@library.com</code> / <code>admin123</code>
+          </div>
+          <button type="button" class="btn-fill-demo" onclick="fillDemoCredentials('admin')">Fill Admin</button>
+        </div>
+        <div class="demo-account-row">
+          <div>
+            <strong>Member:</strong> <code>member@library.com</code> / <code>member123</code>
+          </div>
+          <button type="button" class="btn-fill-demo" onclick="fillDemoCredentials('member')">Fill Member</button>
+        </div>
+      </div>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="/register">Register here</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

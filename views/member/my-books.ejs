@@ -1,0 +1,167 @@
+<%- include('../partials/head', { pageTitle: 'My Borrowed Books - Library Management System' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="dashboard-title-group">
+        <h1>My Borrowed Books</h1>
+        <p class="dashboard-subtitle">Manage your active loans, track return due dates, and review completed borrowings.</p>
+      </div>
+      <a href="/books" class="btn btn-primary">
+        <span>➕</span> Borrow More Books
+      </a>
+    </div>
+
+    <!-- Section 1: Currently Issued Books -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+      <div class="card-header">
+        <h2>
+          <span>📖 Currently Active Loans</span>
+          <span class="badge badge-info" style="margin-left: 0.5rem;"><%= activeBorrows.length %> / 3 books</span>
+        </h2>
+      </div>
+
+      <% if (activeBorrows && activeBorrows.length > 0) { %>
+        <div class="table-responsive" style="border: none; box-shadow: none;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Book Details</th>
+                <th>Category</th>
+                <th>Issue Date</th>
+                <th>Due Date</th>
+                <th>Status / Fine</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% activeBorrows.forEach(function(item) { %>
+                <tr>
+                  <td>
+                    <div style="font-weight: 700; color: var(--text-main); font-size: 1rem;">
+                      <%= item.book ? item.book.title : 'Book Not Found' %>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                      By <%= item.book ? item.book.author : 'Unknown' %> | ISBN: <%= item.book ? item.book.isbn : 'N/A' %>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-secondary"><%= item.book ? item.book.category : 'General' %></span>
+                  </td>
+                  <td><%= new Date(item.issueDate).toLocaleDateString('en-GB') %></td>
+                  <td>
+                    <div style="font-weight: 600;"><%= new Date(item.dueDate).toLocaleDateString('en-GB') %></div>
+                    <% if (item.isOverdue) { %>
+                      <div style="font-size: 0.8rem; color: var(--danger); font-weight: 600;">
+                        ⚠️ <%= item.overdueDays %> day(s) overdue
+                      </div>
+                    <% } else { %>
+                      <div style="font-size: 0.8rem; color: var(--success);">
+                        On Schedule
+                      </div>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (item.isOverdue) { %>
+                      <span class="badge badge-danger">Overdue</span>
+                      <div style="font-size: 0.85rem; font-weight: 700; color: var(--danger); margin-top: 4px;">
+                        Fine: ₹<%= item.currentFine %>
+                      </div>
+                    <% } else { %>
+                      <span class="badge badge-info">Issued</span>
+                      <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                        Fine: ₹0
+                      </div>
+                    <% } %>
+                  </td>
+                  <td style="text-align: right;">
+                    <form action="/borrow/<%= item._id %>/return" method="POST" onsubmit="return confirmAction('Confirm return for this book?');">
+                      <button type="submit" class="btn btn-primary btn-sm">
+                        <span>↩️</span> Return Book
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon">📚</div>
+          <h3 class="empty-state-title">No Active Loans</h3>
+          <p class="empty-state-desc">You do not have any books currently checked out. You can borrow up to 3 books at a time.</p>
+          <a href="/books" class="btn btn-primary">Browse Catalogue</a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Section 2: Returned Books History -->
+    <div class="card">
+      <div class="card-header">
+        <h2>
+          <span>📜 Returned Loan History</span>
+          <span class="badge badge-secondary" style="margin-left: 0.5rem;"><%= returnedBorrows.length %> past loans</span>
+        </h2>
+      </div>
+
+      <% if (returnedBorrows && returnedBorrows.length > 0) { %>
+        <div class="table-responsive" style="border: none; box-shadow: none;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Book Details</th>
+                <th>Issue Date</th>
+                <th>Due Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
+                <th>Fine Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% returnedBorrows.forEach(function(item) { %>
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-main);">
+                      <%= item.book ? item.book.title : 'Book Title' %>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                      By <%= item.book ? item.book.author : '' %>
+                    </div>
+                  </td>
+                  <td><%= new Date(item.issueDate).toLocaleDateString('en-GB') %></td>
+                  <td><%= new Date(item.dueDate).toLocaleDateString('en-GB') %></td>
+                  <td>
+                    <strong><%= item.returnDate ? new Date(item.returnDate).toLocaleDateString('en-GB') : 'N/A' %></strong>
+                  </td>
+                  <td>
+                    <span class="badge badge-success">Returned</span>
+                  </td>
+                  <td>
+                    <% if (item.fine > 0) { %>
+                      <span style="color: var(--danger); font-weight: 700;">₹<%= item.fine %></span>
+                    <% } else { %>
+                      <span style="color: var(--success); font-weight: 600;">₹0 (On Time)</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="empty-state" style="padding: 2.5rem 1rem;">
+          <div class="empty-state-icon" style="font-size: 2rem;">📜</div>
+          <h3 class="empty-state-title" style="font-size: 1.1rem;">No Returned History Yet</h3>
+          <p class="empty-state-desc" style="font-size: 0.875rem;">Completed book loans and return receipts will appear here.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

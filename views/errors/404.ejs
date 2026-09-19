@@ -1,0 +1,20 @@
+<%- include('../partials/head', { pageTitle: '404 - Page Not Found' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 60vh;">
+    <div class="card" style="max-width: 540px; text-align: center; padding: 3rem 2rem;">
+      <div style="font-size: 4rem; color: var(--accent-blue); line-height: 1; margin-bottom: 1rem; font-weight: 800;">404</div>
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.75rem;">Page Not Found</h1>
+      <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem;">
+        The book, catalog page, or resource you were looking for does not exist or has been relocated.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="/" class="btn btn-primary">Return Home</a>
+        <a href="/books" class="btn btn-secondary">Browse Catalogue</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

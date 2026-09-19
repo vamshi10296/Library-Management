@@ -1,0 +1,113 @@
+<%- include('../partials/head', { pageTitle: `Edit ${book.title} - Admin Panel` }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <%- include('../partials/flash-message') %>
+
+    <div class="dashboard-layout">
+      <!-- Admin Sidebar Navigation -->
+      <%- include('../partials/sidebar') %>
+
+      <!-- Main Form Container -->
+      <div class="dashboard-main">
+        <div style="margin-bottom: 1.5rem;">
+          <a href="/admin/books" class="btn btn-secondary btn-sm">&larr; Back to Books Inventory</a>
+        </div>
+
+        <div class="card" style="max-width: 680px; margin: 0 auto;">
+          <div class="card-header">
+            <h2>✏️ Edit Book Details</h2>
+          </div>
+
+          <% if (errors && errors.length > 0) { %>
+            <div class="alert alert-error">
+              <ul style="list-style: none; padding: 0; margin: 0;">
+                <% errors.forEach(function(err) { %>
+                  <li>• <%= err.msg %></li>
+                <% }); %>
+              </ul>
+            </div>
+          <% } %>
+
+          <form action="/admin/books/<%= book._id %>?_method=PUT" method="POST" class="auth-form" novalidate>
+            <div class="form-group">
+              <label for="title" class="form-label">Book Title *</label>
+              <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                class="form-control <%= errors && errors.some(e => e.path === 'title') ? 'input-error' : '' %>" 
+                value="<%= typeof oldInput !== 'undefined' && oldInput.title ? oldInput.title : book.title %>" 
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="author" class="form-label">Author(s) *</label>
+              <input 
+                type="text" 
+                id="author" 
+                name="author" 
+                class="form-control <%= errors && errors.some(e => e.path === 'author') ? 'input-error' : '' %>" 
+                value="<%= typeof oldInput !== 'undefined' && oldInput.author ? oldInput.author : book.author %>" 
+                required
+              >
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+              <div class="form-group">
+                <label for="isbn" class="form-label">ISBN Identifier *</label>
+                <input 
+                  type="text" 
+                  id="isbn" 
+                  name="isbn" 
+                  class="form-control <%= errors && errors.some(e => e.path === 'isbn') ? 'input-error' : '' %>" 
+                  value="<%= typeof oldInput !== 'undefined' && oldInput.isbn ? oldInput.isbn : book.isbn %>" 
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="category" class="form-label">Category / Subject *</label>
+                <input 
+                  type="text" 
+                  id="category" 
+                  name="category" 
+                  class="form-control <%= errors && errors.some(e => e.path === 'category') ? 'input-error' : '' %>" 
+                  value="<%= typeof oldInput !== 'undefined' && oldInput.category ? oldInput.category : book.category %>" 
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="totalCopies" class="form-label">Total Copies *</label>
+              <input 
+                type="number" 
+                id="totalCopies" 
+                name="totalCopies" 
+                min="1" 
+                class="form-control <%= errors && errors.some(e => e.path === 'totalCopies') ? 'input-error' : '' %>" 
+                value="<%= typeof oldInput !== 'undefined' && oldInput.totalCopies ? oldInput.totalCopies : book.totalCopies %>" 
+                required
+              >
+              <small style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; display: block;">
+                Current copies in circulation: <%= book.totalCopies - book.availableCopies %>. Total copies cannot be set below this number.
+              </small>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">
+                <span>💾</span> Update Book
+              </button>
+              <a href="/admin/books" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
